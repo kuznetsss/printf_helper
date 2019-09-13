@@ -1,7 +1,4 @@
-#include <algorithm>
-#include <array>
 #include <iostream>
-#include <string>
 #include <vector>
 
 template <std::size_t N> class StaticString {
@@ -19,17 +16,6 @@ constexpr StaticString<N> CreateStaticString(const char (&s)[N]) {
   return StaticString<N>(s);
 }
 
-/*
-template <std::size_t N>
-constexpr StaticString<N>
-CreateStaticStringFromArray(const std::array<char, N> &array) {
-  char tmp[N];
-  for (std::size_t i = 0; i < N; ++i)
-    tmp[i] = array[i];
-  return CreateStaticString(tmp);
-}
-*/
-
 template <std::size_t N1, std::size_t N2>
 constexpr auto Concat(const StaticString<N1> &s1, const StaticString<N2> &s2) {
   char result[N1 + N2 - 1] = {0};
@@ -45,26 +31,65 @@ template <class T> constexpr auto TypeOf(T) {
   return CreateStaticString("unknown");
 }
 
+//template <> constexpr auto TypeOf<wint_t>(wint_t) {
+//  return CreateStaticString("%lc");
+//}
+template <> constexpr auto TypeOf<char *>(char *) {
+  return CreateStaticString("%s");
+}
+// template <> constexpr auto TypeOf<wchar_t*>(wchar_t*) { return "%ls"); }
+template <> constexpr auto TypeOf<char>(char) {
+  return CreateStaticString("%c");
+}
+template <> constexpr auto TypeOf<short>(short) {
+  return CreateStaticString("%hd");
+}
 template <> constexpr auto TypeOf<int>(int) { return CreateStaticString("%d"); }
-// template <> constexpr auto TypeOf<char>(char) { return "%c"; }
-// template <> constexpr auto TypeOf<char*>(char*) { return "%s"; }
-// template <> constexpr auto TypeOf<float>(float) { return "%f"; }
+template <> constexpr auto TypeOf<long>(long) {
+  return CreateStaticString("%ld");
+}
+template <> constexpr auto TypeOf<long long>(long long) {
+  return CreateStaticString("%lld");
+}
+//template <> constexpr auto TypeOf<intmax_t>(intmax_t) {
+//  return CreateStaticString("%jd");
+//}
+template <> constexpr auto TypeOf<unsigned short>(unsigned short) {
+  return CreateStaticString("%hu");
+}
+template <> constexpr auto TypeOf<unsigned int>(unsigned int) {
+  return CreateStaticString("%u");
+}
+template <> constexpr auto TypeOf<unsigned long>(unsigned long) {
+  return CreateStaticString("%lu");
+}
+template <> constexpr auto TypeOf<unsigned long long>(unsigned long long) {
+  return CreateStaticString("%llu");
+}
+template <> constexpr auto TypeOf<float>(float) {
+  return CreateStaticString("%f");
+}
+template <> constexpr auto TypeOf<double>(double) {
+  return CreateStaticString("%f");
+}
+template <> constexpr auto TypeOf<long double>(long double) {
+  return CreateStaticString("%Lf");
+}
 
 template <class T, class... Args>
 constexpr auto TypeOf(const T &t, const Args &... args) {
-  constexpr auto s1 = TypeOf(t);
-  constexpr auto s2 = TypeOf(args...);
-  constexpr auto r = Concat(s1, s2);
+  const auto s1 = TypeOf(t);
+  const auto s2 = TypeOf(args...);
+  const auto r = Concat(s1, s2);
   return r;
 }
 
 template <class... Args> constexpr auto PrintfFormating(Args... args) {
-  return TypeOf(args...).str;
+  return TypeOf(args...);
 }
 
 int main() {
-  constexpr int t = 3;
-  constexpr auto result = TypeOf(t, 2.);
-  std::cout << result.str << std::endl;
+  constexpr auto s = PrintfFormating("abc", 1, 2.f, 3., 2l, 3u);
+  std::cout << s.str << std::endl;
   return 0;
 }
