@@ -1,4 +1,7 @@
-#include <iostream>
+#ifndef PRINTF_HELPER_H_
+#define PRINTF_HELPER_H_
+
+namespace printf_helper {
 
 template <std::size_t N> class StaticString {
 public:
@@ -77,8 +80,6 @@ template <class... Args> constexpr auto PrintfFormatting(Args... args) {
   return (... + TypeOfCool<Args>());
 }
 
-int main() {
-  constexpr auto s = PrintfFormatting("abc", 1, 2.f, 3., 2l, 3u);
-  std::cout << s.str << std::endl;
-  return 0;
-}
+} // namespace printf_helper
+
+#endif // PRINTF_HELPER_H_
