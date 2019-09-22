@@ -3,6 +3,8 @@
 
 namespace printf_helper {
 
+namespace impl {
+
 template <std::size_t N> class StaticString {
 public:
   constexpr StaticString(const char (&s)[N]) : str{0} {
@@ -34,7 +36,16 @@ template <class T> struct RemoveConstFromPointer<const T *> {
   using type = T *;
 };
 
-template <class T> constexpr auto TypeOf() { CreateStaticString("unknown"); }
+template <class T> constexpr auto TypeOf() {
+  static_assert(std::is_pointer<T>::value || std::is_reference<T>::value,
+                "Unknown type for printf_helper");
+  if constexpr (std::is_pointer<T>::value)
+    return TypeOf<typename RemoveConstFromPointer<T>::type>();
+
+  // T is a reference
+  return TypeOf<
+      typename std::remove_cv<typename std::remove_reference<T>::type>::type>();
+}
 
 // template <> constexpr auto TypeOf<wint_t>(wint_t) {
 //  return CreateStaticString("%lc");
@@ -69,15 +80,10 @@ template <> constexpr auto TypeOf<long double>() {
   return CreateStaticString("%Lf");
 }
 
-template <class T> constexpr auto TypeOfCool() {
-  if constexpr (std::is_pointer<T>::value)
-    return TypeOf<typename RemoveConstFromPointer<T>::type>();
-  else
-    return TypeOf<T>();
-}
+} // namespace impl
 
 template <class... Args> constexpr auto PrintfFormatting(Args... args) {
-  return (... + TypeOfCool<Args>());
+  return (... + impl::TypeOf<Args>());
 }
 
 } // namespace printf_helper
