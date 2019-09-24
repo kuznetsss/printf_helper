@@ -7,12 +7,21 @@ namespace impl {
 
 template <std::size_t N> class StaticString {
 public:
-  constexpr StaticString(const char (&s)[N]) : str{0} {
+  constexpr explicit StaticString(const char (&s)[N]) : str_{0} {
     for (std::size_t i = 0; i < N; ++i)
-      str[i] = s[i];
+      str_[i] = s[i];
   }
 
-  char str[N];
+  constexpr operator const char *() const { return str_; } // NOLINT
+
+  template <std::size_t N1, std::size_t N2>
+  friend constexpr auto operator+(StaticString<N1> lhs, const char (&rhs)[N2]);
+
+  template <std::size_t N1, std::size_t N2>
+  friend constexpr auto operator+(StaticString<N1> lhs, StaticString<N2> rhs);
+
+private:
+  char str_[N];
 };
 
 template <std::size_t N>
@@ -21,14 +30,19 @@ constexpr StaticString<N> CreateStaticString(const char (&s)[N]) {
 }
 
 template <std::size_t N1, std::size_t N2>
-constexpr auto operator+(StaticString<N1> lhs, StaticString<N2> rhs) {
+constexpr auto operator+(StaticString<N1> lhs, const char (&rhs)[N2]) {
   char result[N1 + N2 - 1] = {0};
   for (std::size_t i = 0; i < N1 - 1; ++i)
-    result[i] = lhs.str[i];
+    result[i] = lhs.str_[i];
   std::size_t j = 0;
   for (std::size_t i = N1 - 1; i < N1 + N2 - 2; ++i, ++j)
-    result[i] = rhs.str[j];
+    result[i] = rhs[j];
   return CreateStaticString(result);
+}
+
+template <std::size_t N1, std::size_t N2>
+constexpr auto operator+(StaticString<N1> lhs, StaticString<N2> rhs) {
+  return lhs + rhs.str_;
 }
 
 template <class T> struct RemoveConstFromPointer { using type = T; };
@@ -36,11 +50,19 @@ template <class T> struct RemoveConstFromPointer<const T *> {
   using type = T *;
 };
 
+template <class T> constexpr auto TypeOfPointer() {
+  return CreateStaticString("%p");
+}
+
+template <> constexpr auto TypeOfPointer<char *>() {
+  return CreateStaticString("%s");
+}
+
 template <class T> constexpr auto TypeOf() {
   static_assert(std::is_pointer<T>::value || std::is_reference<T>::value,
                 "Unknown type for printf_helper");
   if constexpr (std::is_pointer<T>::value)
-    return TypeOf<typename RemoveConstFromPointer<T>::type>();
+    return TypeOfPointer<typename RemoveConstFromPointer<T>::type>();
 
   // T is a reference
   return TypeOf<
@@ -50,7 +72,6 @@ template <class T> constexpr auto TypeOf() {
 // template <> constexpr auto TypeOf<wint_t>(wint_t) {
 //  return CreateStaticString("%lc");
 //}
-template <> constexpr auto TypeOf<char *>() { return CreateStaticString("%s"); }
 // template <> constexpr auto TypeOf<wchar_t*>(wchar_t*) { return "%ls"); }
 template <> constexpr auto TypeOf<char>() { return CreateStaticString("%c"); }
 template <> constexpr auto TypeOf<short>() { return CreateStaticString("%hd"); }
@@ -62,6 +83,10 @@ template <> constexpr auto TypeOf<long long>() {
 // template <> constexpr auto TypeOf<intmax_t>(intmax_t) {
 //  return CreateStaticString("%jd");
 //}
+
+template <> constexpr auto TypeOf<unsigned char>() {
+  return CreateStaticString("%hhu");
+}
 template <> constexpr auto TypeOf<unsigned short>() {
   return CreateStaticString("%hu");
 }
@@ -82,7 +107,7 @@ template <> constexpr auto TypeOf<long double>() {
 
 } // namespace impl
 
-template <class... Args> constexpr auto PrintfFormatting(Args... args) {
+template <class... Args> constexpr auto GetPrintfFormat(Args... args) {
   return (... + impl::TypeOf<Args>());
 }
 
