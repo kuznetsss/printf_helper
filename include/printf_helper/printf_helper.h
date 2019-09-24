@@ -5,9 +5,9 @@ namespace printf_helper {
 
 namespace impl {
 
-template <std::size_t N> class StaticString {
+template <std::size_t N> class ConstexprString {
 public:
-  constexpr explicit StaticString(const char (&s)[N]) : str_{0} {
+  constexpr explicit ConstexprString(const char (&s)[N]) : str_{0} {
     for (std::size_t i = 0; i < N; ++i)
       str_[i] = s[i];
   }
@@ -15,33 +15,35 @@ public:
   constexpr operator const char *() const { return str_; } // NOLINT
 
   template <std::size_t N1, std::size_t N2>
-  friend constexpr auto operator+(StaticString<N1> lhs, const char (&rhs)[N2]);
+  friend constexpr auto operator+(ConstexprString<N1> lhs,
+                                  const char (&rhs)[N2]);
 
   template <std::size_t N1, std::size_t N2>
-  friend constexpr auto operator+(StaticString<N1> lhs, StaticString<N2> rhs);
+  friend constexpr auto operator+(ConstexprString<N1> lhs,
+                                  ConstexprString<N2> rhs);
 
 private:
   char str_[N];
 };
 
 template <std::size_t N>
-constexpr StaticString<N> CreateStaticString(const char (&s)[N]) {
-  return StaticString<N>(s);
+constexpr ConstexprString<N> CreateConstexprString(const char (&s)[N]) {
+  return ConstexprString<N>(s);
 }
 
 template <std::size_t N1, std::size_t N2>
-constexpr auto operator+(StaticString<N1> lhs, const char (&rhs)[N2]) {
+constexpr auto operator+(ConstexprString<N1> lhs, const char (&rhs)[N2]) {
   char result[N1 + N2 - 1] = {0};
   for (std::size_t i = 0; i < N1 - 1; ++i)
     result[i] = lhs.str_[i];
   std::size_t j = 0;
   for (std::size_t i = N1 - 1; i < N1 + N2 - 2; ++i, ++j)
     result[i] = rhs[j];
-  return CreateStaticString(result);
+  return CreateConstexprString(result);
 }
 
 template <std::size_t N1, std::size_t N2>
-constexpr auto operator+(StaticString<N1> lhs, StaticString<N2> rhs) {
+constexpr auto operator+(ConstexprString<N1> lhs, ConstexprString<N2> rhs) {
   return lhs + rhs.str_;
 }
 
@@ -51,11 +53,11 @@ template <class T> struct RemoveConstFromPointer<const T *> {
 };
 
 template <class T> constexpr auto TypeOfPointer() {
-  return CreateStaticString("%p");
+  return CreateConstexprString("%p");
 }
 
 template <> constexpr auto TypeOfPointer<char *>() {
-  return CreateStaticString("%s");
+  return CreateConstexprString("%s");
 }
 
 template <class T> constexpr auto TypeOf() {
@@ -70,39 +72,49 @@ template <class T> constexpr auto TypeOf() {
 }
 
 // template <> constexpr auto TypeOf<wint_t>(wint_t) {
-//  return CreateStaticString("%lc");
+//  return CreateConstexprString("%lc");
 //}
 // template <> constexpr auto TypeOf<wchar_t*>(wchar_t*) { return "%ls"); }
-template <> constexpr auto TypeOf<char>() { return CreateStaticString("%c"); }
-template <> constexpr auto TypeOf<short>() { return CreateStaticString("%hd"); }
-template <> constexpr auto TypeOf<int>() { return CreateStaticString("%d"); }
-template <> constexpr auto TypeOf<long>() { return CreateStaticString("%ld"); }
+template <> constexpr auto TypeOf<char>() {
+  return CreateConstexprString("%c");
+}
+template <> constexpr auto TypeOf<short>() {
+  return CreateConstexprString("%hd");
+}
+template <> constexpr auto TypeOf<int>() { return CreateConstexprString("%d"); }
+template <> constexpr auto TypeOf<long>() {
+  return CreateConstexprString("%ld");
+}
 template <> constexpr auto TypeOf<long long>() {
-  return CreateStaticString("%lld");
+  return CreateConstexprString("%lld");
 }
 // template <> constexpr auto TypeOf<intmax_t>(intmax_t) {
-//  return CreateStaticString("%jd");
+//  return CreateConstexprString("%jd");
 //}
 
 template <> constexpr auto TypeOf<unsigned char>() {
-  return CreateStaticString("%hhu");
+  return CreateConstexprString("%hhu");
 }
 template <> constexpr auto TypeOf<unsigned short>() {
-  return CreateStaticString("%hu");
+  return CreateConstexprString("%hu");
 }
 template <> constexpr auto TypeOf<unsigned int>() {
-  return CreateStaticString("%u");
+  return CreateConstexprString("%u");
 }
 template <> constexpr auto TypeOf<unsigned long>() {
-  return CreateStaticString("%lu");
+  return CreateConstexprString("%lu");
 }
 template <> constexpr auto TypeOf<unsigned long long>() {
-  return CreateStaticString("%llu");
+  return CreateConstexprString("%llu");
 }
-template <> constexpr auto TypeOf<float>() { return CreateStaticString("%f"); }
-template <> constexpr auto TypeOf<double>() { return CreateStaticString("%f"); }
+template <> constexpr auto TypeOf<float>() {
+  return CreateConstexprString("%f");
+}
+template <> constexpr auto TypeOf<double>() {
+  return CreateConstexprString("%f");
+}
 template <> constexpr auto TypeOf<long double>() {
-  return CreateStaticString("%Lf");
+  return CreateConstexprString("%Lf");
 }
 
 } // namespace impl
