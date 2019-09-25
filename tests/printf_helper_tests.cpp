@@ -1,12 +1,13 @@
-#include <iostream>
-
 #include "printf_helper/printf_helper.h"
 
 #include <gtest/gtest.h>
 
+#include <string>
+
 class PrintfHelperTests : public ::testing::Test {
-protected:
-  template <class T> std::string GetFormatString(T t) {
+ protected:
+  template <class T>
+  std::string GetFormatString(T t) {
     return std::string(printf_helper::GetPrintfFormat(t));
   };
 };
