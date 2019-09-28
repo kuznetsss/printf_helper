@@ -9,15 +9,25 @@ endif ()
 
 
 include(${CMAKE_BINARY_DIR}/conan.cmake)
-set(ENV{CONAN_USER_HOME} ${CMAKE_BINARY_DIR}/../conan)
+set(ENV{CONAN_USER_HOME} ${PROJECT_SOURCE_DIR})
+
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  set(CONAN_PROFILE clang)
+else ()
+  set(CONAN_PROFILE gcc)
+endif ()
 conan_cmake_run(REQUIRES gtest/1.8.1
   BASIC_SETUP CMAKE_TARGETS
-  BUILD missing)
+  BUILD missing
+  PROFILE ${CONAN_PROFILE}
+  )
 
 set(CMAKE_CXX_STANDARD 17)
 
 add_library(printf_helper INTERFACE)
 target_include_directories(printf_helper INTERFACE include)
+
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/ TYPE INCLUDE)
 
 add_executable(printf_helper_tests tests/printf_helper_tests.cpp)
 target_link_libraries(printf_helper_tests
