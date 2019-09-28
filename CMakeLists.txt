@@ -26,6 +26,7 @@ conan_cmake_run(REQUIRES gtest/1.8.1
   BUILD missing
   SETTINGS compiler=${CONAN_COMPILER}
   compiler.version=${CONAN_COMPILER_VERSION}
+  compiler.libcxx=libstdc++11
   ENV CC=${CMAKE_C_COMPILER}
   CXX=${CMAKE_CXX_COMPILER}
   )

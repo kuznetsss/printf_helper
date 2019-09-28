@@ -30,6 +30,6 @@ install:
 
 script:
   - cd build
-  - cmake .. -DCMAKE_BUILD_TYPE=Debug
+  - cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=$CXX -DCMAKE_C_COMPILER=$CC
   - make -j2 printf_helper_tests
   - ctest --verbose
