@@ -10,3 +10,5 @@ build_type=Release
 [options]
 [build_requires]
 [env]
+CXX=/usr/bin/g++-9
+CC=/usr/bin/gcc-9

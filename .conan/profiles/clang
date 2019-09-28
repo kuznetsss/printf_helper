@@ -10,3 +10,5 @@ build_type=Release
 [options]
 [build_requires]
 [env]
+CXX=/usr/bin/clang++
+CC=/usr/bin/clang-8
