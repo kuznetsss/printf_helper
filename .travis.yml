@@ -25,10 +25,10 @@ install:
   - wget https://dl.bintray.com/conan/installers/conan-ubuntu-64_1_18_5.deb
   - sudo dpkg -i conan-ubuntu-64_1_18_5.deb
   - sudo apt install -f
-  - if [ "$CXX" = "g++" ]; then export CXX="g++-9" CC="gcc-9"; fi
-  - if [ "$CXX" = "clang++" ]; then export CXX="clang++-8" CC="clang-8"; fi;
 
 script:
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-9" CC="gcc-9"; fi
+  - if [ "$CXX" = "clang++" ]; then export CXX="clang++-8" CC="clang-8"; fi;
   - cd build
   - cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=$CXX -DCMAKE_C_COMPILER=$CC
   - make -j2 printf_helper_tests
