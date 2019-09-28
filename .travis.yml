@@ -27,9 +27,6 @@ install:
   - sudo apt install -f
   - if [ "$CXX" = "g++" ]; then export CXX="g++-9" CC="gcc-9"; fi
   - if [ "$CXX" = "clang++" ]; then export CXX="clang++-8" CC="clang-8"; fi;
-  - export CONAN_USER_HOME=$PWD
-  - if [ "$CXX" = "g++-9" ]; then conan install . -if=build -pr gcc --build missing; fi
-  - if [ "$CXX" = "clang-8" ]; then conan install . -if=build -pr gcc --build missing; fi
 
 script:
   - cd build

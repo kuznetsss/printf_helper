@@ -1,34 +1,26 @@
 cmake_minimum_required(VERSION 3.12)
 project(printf_helper)
 
-#
-#if (NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
-#  message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
-#  file(DOWNLOAD "https://github.com/conan-io/cmake-conan/raw/v0.14/conan.cmake"
-#    "${CMAKE_BINARY_DIR}/conan.cmake")
-#endif ()
-#
-#
-#include(${CMAKE_BINARY_DIR}/conan.cmake)
-#set(ENV{CONAN_USER_HOME} ${PROJECT_SOURCE_DIR})
-#
-#if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-#  set(CONAN_PROFILE clang)
-#else ()
-#  set(CONAN_PROFILE gcc)
-#endif ()
-#conan_cmake_run(REQUIRES gtest/1.8.1
-#  BASIC_SETUP CMAKE_TARGETS
-#  BUILD missing
-#  PROFILE ${CONAN_PROFILE}
-#  )
-set(CONAN_CMAKE_FILE ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-if (EXISTS ${CONAN_CMAKE_FILE})
-  include(${CONAN_CMAKE_FILE})
-else ()
-  message(FATAL_ERROR "Can't find conan file ${CONAN_CMAKE_FILE}")
+if (NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
+  message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
+  file(DOWNLOAD "https://github.com/conan-io/cmake-conan/raw/v0.14/conan.cmake"
+    "${CMAKE_BINARY_DIR}/conan.cmake")
 endif ()
-conan_basic_setup(TARGETS)
+
+
+include(${CMAKE_BINARY_DIR}/conan.cmake)
+set(ENV{CONAN_USER_HOME} ${PROJECT_SOURCE_DIR})
+
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  set(CONAN_PROFILE clang)
+else ()
+  set(CONAN_PROFILE gcc)
+endif ()
+conan_cmake_run(REQUIRES gtest/1.8.1
+  BASIC_SETUP CMAKE_TARGETS
+  BUILD missing
+  PROFILE ${CONAN_PROFILE}
+  )
 
 set(CMAKE_CXX_STANDARD 17)
 
