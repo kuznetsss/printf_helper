@@ -15,7 +15,11 @@ if (${CMAKE_CXX_COMPILER_ID} STREQUAL GNU)
 else ()
   set(CONAN_COMPILER clang)
 endif ()
-string(SUBSTRING ${CMAKE_CXX_COMPILER_VERSION} 0 1 CONAN_COMPILER_VERSION)
+string(SUBSTRING ${CMAKE_CXX_COMPILER_VERSION} 0 3 CONAN_COMPILER_VERSION)
+
+if (${CONAN_COMPILER} STREQUAL clang AND ${CONAN_COMPILER_VERSION} STREQUAL 8.0)
+  set(CONAN_COMPILER_VERSION 8)
+endif ()
 
 conan_cmake_run(REQUIRES gtest/1.8.1
   BASIC_SETUP CMAKE_TARGETS
@@ -31,7 +35,7 @@ set(CMAKE_CXX_STANDARD 17)
 add_library(printf_helper INTERFACE)
 target_include_directories(printf_helper INTERFACE include)
 
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/ TYPE INCLUDE)
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/ DESTINATION include)
 
 add_executable(printf_helper_tests tests/printf_helper_tests.cpp)
 target_link_libraries(printf_helper_tests
