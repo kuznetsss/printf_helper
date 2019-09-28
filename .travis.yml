@@ -1,0 +1,35 @@
+dist: xenial
+language: cpp
+compiler:
+  - clang
+  - gcc
+
+cache:
+  directories:
+    - /home/travis/build/kuznetsss/printf_helper/build
+
+addons:
+  apt:
+    sources:
+      - llvm-toolchain-xenial-8
+      - ubuntu-toolchain-r-test
+    packages:
+      - clang-8
+      - cmake
+      - gcc-9
+      - g++-9
+
+
+install:
+  # Install conan
+  - wget https://dl.bintray.com/conan/installers/conan-ubuntu-64_1_18_5.deb
+  - sudo dpkg -i conan-ubuntu-64_1_18_5.deb
+  - sudo apt install -f
+
+script:
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-9" CC="gcc-9"; fi
+  - if [ "$CXX" = "clang++" ]; then export CXX="clang++-8" CC="clang-8"; fi;
+  - cd build
+  - cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=$CXX -DCMAKE_C_COMPILER=$CC
+  - make -j2 printf_helper_tests
+  - ctest --verbose

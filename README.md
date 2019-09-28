@@ -1,5 +1,8 @@
 # Printf_helper library
 
+
+[![Build Status](https://travis-ci.com/kuznetsss/printf_helper.svg?branch=master)](https://travis-ci.com/kuznetsss/printf_helper)
+
 Printf_helper is simple header-only C++ library for deducing format
  string for printf at compile time.
  

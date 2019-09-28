@@ -11,7 +11,7 @@ namespace impl {
 template <std::size_t N>
 class ConstexprString {
  public:
-  constexpr ConstexprString(const char (&s)[N]) : str_{0} {
+  constexpr explicit ConstexprString(const char (&s)[N]) : str_{0} {
     for (std::size_t i = 0; i < N; ++i) str_[i] = s[i];
   }
 
