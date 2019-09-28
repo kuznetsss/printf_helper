@@ -11,6 +11,7 @@ cache:
 addons:
   apt:
     sources:
+      - llvm-toolchain-xenial-8
       - ubuntu-toolchain-r-test
     packages:
       - clang-8
