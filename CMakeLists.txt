@@ -45,5 +45,5 @@ target_link_libraries(printf_helper_tests
   printf_helper
   CONAN_PKG::gtest
   )
-
-add_test(COMMAND printf_helper_tests NAME printf_helper_tests)
+enable_testing()
+add_test(NAME printf_helper_tests COMMAND printf_helper_tests)
