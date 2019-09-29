@@ -18,6 +18,14 @@ Printf_helper is simple header-only C++ library for deducing format
 The function `printf_helper::GetPrintfFormat()` is not constexpr from the
  outside, but inside it just returns constexpr variable.
  
- The returned type is a special class `ConstexprString`. It can be implicitly
- converted to `const char *`. Also `ConstexprString` has constexpr `operator+`
- for `const char *` or another `ConstexprString`.
+The returned type is a special class `ConstexprString`. It can be implicitly
+converted to `const char *`. Also `ConstexprString` has constexpr `operator+`
+for `const char *` or another `ConstexprString`.
+
+## Compiling
+
+- C++ 17 is required to use the library. 
+- Gtest library is used for tests. Conan will upload gtest
+  automatically.
+- You can disable compiling tests by setting cmake variable
+  `ENABLE_TESTS` to `FALSE`.
